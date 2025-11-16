@@ -11,7 +11,37 @@ const ordersRoutes = require("./routes/orders");
 const recommendationsRoutes = require("./routes/recommendations");
 
 const app = express();
-app.use(cors());
+
+// Configure CORS to allow requests from your frontend and handle preflight
+// Use environment variable ALLOWED_ORIGINS (comma-separated) or allow all with '*'
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests (e.g., server-to-server or tools without origin)
+    if (!origin) return callback(null, true);
+    const allowed = (process.env.ALLOWED_ORIGINS || '*')
+      .split(',')
+      .map((s) => s.trim());
+    if (allowed.includes('*') || allowed.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+// Ensure preflight requests are handled
+app.options('*', cors(corsOptions));
+
+// Add explicit headers as a fallback for any intermediate proxy
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGINS || '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
+
 app.use(express.json());
 
 // Health check endpoint
