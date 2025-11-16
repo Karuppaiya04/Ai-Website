@@ -12,33 +12,50 @@ const recommendationsRoutes = require("./routes/recommendations");
 
 const app = express();
 
-// Configure CORS to allow requests from your frontend and handle preflight
-// Use environment variable ALLOWED_ORIGINS (comma-separated) or allow all with '*'
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow non-browser requests (e.g., server-to-server or tools without origin)
-    if (!origin) return callback(null, true);
-    const allowed = (process.env.ALLOWED_ORIGINS || '*')
-      .split(',')
-      .map((s) => s.trim());
-    if (allowed.includes('*') || allowed.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-};
+// Simplified, permissive CORS for frontend usage and preflight handling.
+// This ensures responses include Access-Control-Allow-* headers for browsers.
+app.use(
+  cors({
+    origin: true, // reflect request origin
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
+      "Authorization",
+    ],
+  })
+);
+// Explicitly respond to OPTIONS (preflight)
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,PUT,POST,PATCH,DELETE,OPTIONS"
+  );
+  return res.sendStatus(200);
+});
 
-app.use(cors(corsOptions));
-// Ensure preflight requests are handled
-app.options('*', cors(corsOptions));
-
-// Add explicit headers as a fallback for any intermediate proxy
+// Fallback header injector in case something strips headers later
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGINS || '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,PUT,POST,PATCH,DELETE,OPTIONS"
+  );
+  if (req.method === "OPTIONS") return res.sendStatus(200);
   next();
 });
 
