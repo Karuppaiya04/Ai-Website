@@ -4,17 +4,20 @@ import axios from "axios";
 // For production deployment on Vercel
 const getBaseURL = () => {
   // If running on Vercel production (check window.location)
-  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
-    return "https://backend-38w5dq9mo-karuppaiyas-projects-9a0989eb.vercel.app";
+  if (
+    typeof window !== "undefined" &&
+    window.location.hostname.includes("vercel.app")
+  ) {
+    return "https://backend-9o3e982cv-karuppaiyas-projects-9a0989eb.vercel.app";
   }
-  
+
   // Try to get from environment variable
   const envURL = import.meta.env.VITE_API_URL;
   if (envURL) {
     // Clean the URL to remove any BOM characters, line breaks, or extra whitespace
     return envURL.replace(/[\uFEFF\r\n\t]/g, "").trim();
   }
-  
+
   // Default to localhost for development
   return "http://localhost:4000";
 };
