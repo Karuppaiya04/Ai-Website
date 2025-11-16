@@ -93,4 +93,29 @@ router.get("/menu/public", async (req, res) => {
 
 // Update & delete endpoints would go here (left as exercise)
 
+// Delete a menu item (Manager only)
+router.delete(
+  "/menu/:id",
+  authMiddleware,
+  roleRequired("manager"),
+  async (req, res) => {
+    try {
+      const id = req.params.id;
+      const db = getDb();
+      const foodItemsRef = db.collection("foodItems");
+
+      try {
+        await foodItemsRef.doc(id).delete();
+        return res.json({ message: "Item deleted" });
+      } catch (dbError) {
+        console.error("Firebase delete error:", dbError.message);
+        return res.status(500).json({ message: "Could not delete item" });
+      }
+    } catch (err) {
+      console.error("Delete menu item error:", err.message);
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
 module.exports = router;

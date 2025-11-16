@@ -68,6 +68,21 @@ export default function Manager() {
     }
   };
 
+  const deleteMenuItem = async (id) => {
+    if (!confirm("Delete this menu item? This cannot be undone.")) return;
+    try {
+      await axios.delete(`/manager/menu/${id}`);
+      // refresh list
+      loadMenu();
+      alert("Item deleted");
+    } catch (e) {
+      console.error("Failed to delete item:", e);
+      const errorMsg =
+        e.response?.data?.message || e.message || "Failed to delete item";
+      alert(`Failed to delete item: ${errorMsg}`);
+    }
+  };
+
   const generateQR = () => {
     if (!qrTable) return;
     // QR code will encode the URL to table scan page with table number
@@ -201,11 +216,20 @@ export default function Manager() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {menuItems.map((item, index) => (
                 <div
-                  key={item._id}
+                  key={item.id}
                   className={`card-elevated p-6 hover-scale animate-fadeIn delay-${
                     (index % 3) * 100
-                  }`}
+                  } relative`}
                 >
+                  {/* Delete button */}
+                  <button
+                    onClick={() => deleteMenuItem(item.id)}
+                    className="absolute top-3 right-3 bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1 rounded-full text-sm font-semibold"
+                    title="Delete item"
+                  >
+                    🗑️
+                  </button>
+
                   {item.imageUrl && (
                     <div className="relative overflow-hidden rounded-xl mb-4">
                       <img
