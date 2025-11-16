@@ -22,7 +22,9 @@ const getBaseURL = () => {
   return "http://localhost:4000";
 };
 
-const baseURL = getBaseURL();
+let baseURL = getBaseURL();
+// Normalize: remove any trailing slashes to avoid double-slash in requests
+baseURL = baseURL.replace(/\/+$/g, "");
 console.log("🔧 Axios Base URL:", baseURL);
 
 axios.defaults.baseURL = baseURL;
