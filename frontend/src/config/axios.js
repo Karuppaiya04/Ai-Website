@@ -8,7 +8,7 @@ const getBaseURL = () => {
     typeof window !== "undefined" &&
     window.location.hostname.includes("vercel.app")
   ) {
-    return "https://backend-9o3e982cv-karuppaiyas-projects-9a0989eb.vercel.app";
+    return "https://ai-website-5d6c.vercel.app/";
   }
 
   // Try to get from environment variable
