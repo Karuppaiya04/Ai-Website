@@ -7,7 +7,7 @@ export default function Login() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("customer");
+  const [role, setRole] = useState("waiter");
   const [error, setError] = useState("");
   const { login, register } = useAuth();
   const navigate = useNavigate();
@@ -134,7 +134,6 @@ export default function Login() {
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
               >
-                <option value="customer">🍽️ Customer</option>
                 <option value="chef">👨‍🍳 Chef</option>
                 <option value="waiter">🤵 Waiter</option>
                 <option value="manager">💼 Manager</option>
