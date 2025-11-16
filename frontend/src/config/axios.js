@@ -1,11 +1,26 @@
 import axios from "axios";
 
 // Set the base URL for all axios requests
-// Clean the URL to remove any BOM characters, line breaks, or extra whitespace
-const rawURL = import.meta.env.VITE_API_URL || "http://localhost:4000";
-const baseURL = rawURL.replace(/[\uFEFF\r\n\t]/g, "").trim();
-console.log("🔧 Axios Base URL (raw):", rawURL);
-console.log("🔧 Axios Base URL (cleaned):", baseURL);
+// For production deployment on Vercel
+const getBaseURL = () => {
+  // If running on Vercel production (check window.location)
+  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+    return "https://backend-38w5dq9mo-karuppaiyas-projects-9a0989eb.vercel.app";
+  }
+  
+  // Try to get from environment variable
+  const envURL = import.meta.env.VITE_API_URL;
+  if (envURL) {
+    // Clean the URL to remove any BOM characters, line breaks, or extra whitespace
+    return envURL.replace(/[\uFEFF\r\n\t]/g, "").trim();
+  }
+  
+  // Default to localhost for development
+  return "http://localhost:4000";
+};
+
+const baseURL = getBaseURL();
+console.log("🔧 Axios Base URL:", baseURL);
 
 axios.defaults.baseURL = baseURL;
 
